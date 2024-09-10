@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 보기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            font-family: Arial, sans-serif;
+        }
+
+        #post-content {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 800px;
+            height: 500px;
+            margin: 20px auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        strong {
+            color: #333;
+        }
+
+        .author-date {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        .back{
+            width: 1380px;
+            justify-content: right;
+            align-items: center;
+            display: flex;
+        }
+
+        .delete{
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="post-content"></div>
+    <div class="back">
+        <button onclick="location.href='/'">목록 돌아가기</button>
+        <button class="delete" onclick="deletePost()">삭제</button>
+    </div>
+
+        
+    
+
+    <script>
+        const postId = window.location.pathname.split('/').pop(); // URL에서 ID 추출
+
+        // 게시글 가져오기
+        fetch(`/posts`)
+        .then(response => response.json())
+        .then(data => {
+            const post = data[postId]; // 해당 게시글 가져오기
+            if (post) {
+                document.getElementById('post-content').innerHTML = `
+                    <h1>${post.title}</h1>
+                    <p class="author-date"><strong>작성자:</strong> ${post.author} | <strong>작성일:</strong> ${new Date(post.date).toLocaleDateString()}</p>
+                    <p>${post.content}</p>
+                `;
+            } else {
+                document.getElementById('post-content').innerHTML = '게시글을 찾을 수 없습니다.';
+            }
+        })
+        .catch(error => console.error('Error fetching post:', error));
+
+        // 게시글 삭제 함수
+        function deletePost() {
+            const confirmDelete = confirm("정말로 이 게시글을 삭제하시겠습니까?");
+            if (confirmDelete) {
+                fetch(`/posts/${postId+1}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert("게시글이 삭제되었습니다.");
+                        location.href = '/'; // 목록 페이지로 리다이렉트
+                    } else {
+                        alert("게시글 삭제에 실패했습니다.");
+                    }
+                })
+                .catch(error => console.error('Error deleting post:', error));
+            }
+        }
+    </script>
+</body>
+</html>

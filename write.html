@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 작성</title>
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center; /* 수평 가운데 정렬 */
+        align-items: center; /* 수직 가운데 정렬 */
+        }
+        input[type="text"]{
+            width: 395px;
+            height: 30px;
+            border: 1.5px rgb(68, 136, 244) solid;
+            border-radius: 10px;
+        }
+        textarea{
+            width: 812px;
+            height: 500px;
+            border: 1.5px rgb(68, 136, 244) solid;
+            border-radius: 10px;
+        }
+        .text-type{
+            width: 812px;
+            margin:0 auto;
+        }
+        .submit {
+            display: flex;
+            justify-content: flex-end;
+            width: 812px;
+            margin-right: 10px;
+        }
+        input[type="submit"]{
+            width: 80px;
+            height: 30px;
+            display:block;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="text-type">
+        <input type="text" id="title" placeholder="제목을 입력하세요">
+        <input type="text" id="author" placeholder="작성자">
+        <p><textarea id="content" placeholder="내용을 입력하세요" name="detail"></textarea></p>
+
+        <div class="submit">
+            <p><input type="submit" id="submit-btn" value="등록"></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('submit-btn').addEventListener('click', function() {
+            const title = document.getElementById('title').value;
+            const author = document.getElementById('author').value;
+            const content = document.getElementById('content').value;
+
+            const data = { title, author, content };
+
+            fetch('/addPost', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('등록 성공');
+                    window.location.href = '/';
+                } else {
+                    alert('등록 실패');
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

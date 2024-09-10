@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="sec_1">
+        <h1>Q&A</h1>
+        <div class="line"></div>
+    </div>
+    <div class="sec_2">
+        <ul>
+            <li class="menu_1">NOTICE</li>
+            <li class="menu_2">FAQ</li>
+            <li class="menu_3">Q&A</li>
+            <li class="menu_4">1:1문의</li>
+            <li class="menu_5">CLASS</li>
+            <li class="menu_6">입고정보</li>
+        </ul>        
+    </div>
+    <div class="sec_3">
+        <ul class="header">
+            <li class="header-no">No</li>
+            <li class="header-title">제목</li>
+            <li class="header-write">글쓴이</li>
+            <li class="header-date">작성날짜</li>
+        </ul>
+        <ul id="post-list">
+
+        </ul>
+    </div>
+    
+    <div class="sec_4">
+        <ul>
+            <li class="search-box">
+                <input onkeyup="filter()" type="text" id="value" placeholder="제목 또는 글쓴이로 검색" style="height:20px">
+            </li>
+            <li class="write-box">
+                <button class="write" onclick="location.href='write.html'">글쓰기</button>
+            </li>
+        </ul>    
+    </div>
+
+    <script>
+        let posts = []; // 게시글 데이터를 저장할 배열
+
+        fetch('/posts')
+        .then(response => response.json())
+        .then(data => {
+            posts = data; // 받아온 데이터를 posts 배열에 저장
+            displayPosts(posts); // 게시글 표시
+        })
+        .catch(error => console.error('Error fetching posts:', error));
+
+        function displayPosts(postsToDisplay) {
+            const postList = document.getElementById('post-list');
+            postList.innerHTML = ''; 
+            postsToDisplay.forEach((post, index) => {
+                const li = document.createElement('li');
+                li.classList.add('post-item');
+                li.innerHTML = `
+                    <span class="post-no">${index + 1}</span>
+                    <span class="post-title"><a href="/post/${index}">${post.title}</a></span>
+                    <span class="post-author">${post.author}</span>
+                    <span class="post-date">${new Date(post.date).toLocaleDateString()}</span>
+                `;
+                postList.appendChild(li);
+            });
+        }
+
+        function filter() {
+            const searchValue = document.getElementById('value').value.toLowerCase(); // 입력값을 소문자로 변환
+            const filteredPosts = posts.filter(post => 
+                post.title.toLowerCase().includes(searchValue) || 
+                post.author.toLowerCase().includes(searchValue) // 제목이나 글쓴이에서 검색
+            );
+            displayPosts(filteredPosts); // 필터링된 게시글 표시
+        }
+    </script>
+</body>
+</html>
